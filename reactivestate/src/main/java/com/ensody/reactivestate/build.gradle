@@ -1,0 +1,6 @@
+package com.ensody.reactivestate
+dependencies {
+    androidBase()
+    commonMainApi project(":reactivestate-core")
+    commonTestImplementation project(":reactivestate-test")
+}
