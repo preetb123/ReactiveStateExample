@@ -44,6 +44,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-service:2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation 'com.github.RomanPozdeev:MobX:0.1'
+
     api platform("com.ensody.reactivestate:reactivestate-bom:5.5.5")
 
     // Leave out the version number from now on:

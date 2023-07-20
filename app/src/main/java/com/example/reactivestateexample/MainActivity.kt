@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.ensody.reactivestate.BaseReactiveState
 import com.ensody.reactivestate.ErrorEvents
 import com.ensody.reactivestate.android.autoRun
@@ -20,6 +21,8 @@ import com.ensody.reactivestate.get
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import mobx.core.Disposable
+import mobx.core.autorun
 
 interface MainEvents : ErrorEvents {
 }
@@ -41,6 +44,8 @@ class MainViewModel(
 class MainActivity : AppCompatActivity(), MainEvents {
 
     private val viewModel by reactiveState { MainViewModel(scope) }
+    private val disposables = mutableSetOf<Disposable>()
+
 
     private lateinit var textView: TextView
     private lateinit var mService: MyService
@@ -64,9 +69,11 @@ class MainActivity : AppCompatActivity(), MainEvents {
     }
 
     private fun initUIUpdates() {
-        autoRun {
-            textView.text = "Current number: ${get(viewModel.squareOfNumber)}"
-        }
+//        autorun {
+//            textView.text = "square of ${mService.dataStore.counter} is: ${mService.dataStore.counterSquare}"
+//        }.also {
+//            disposables.add(it)
+//        }
     }
 
     @SuppressLint("MissingInflatedId")
@@ -76,9 +83,13 @@ class MainActivity : AppCompatActivity(), MainEvents {
         val button = findViewById<Button>(R.id.button)
         textView = findViewById<TextView>(R.id.textView)
 
-//        Intent(this, MyService::class.java).also { intent ->
-//            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//        }
+
+
+        val intent = Intent(this, MyService::class.java)
+
+        ContextCompat.startForegroundService(this, intent)
+
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onError(error: Throwable) {
@@ -88,5 +99,12 @@ class MainActivity : AppCompatActivity(), MainEvents {
         super.onStop()
         unbindService(connection)
         mBound = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        disposables.forEach { it.dispose() }
+        disposables.clear()
     }
 }
